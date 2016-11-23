@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/sintax1/vsphere-controller/issues"
   },
-  "homepage": "https://github.com/sintax1/vsphere-controller#readme"
+  "homepage": "https://github.com/sintax1/vsphere-controller#readme",
+  "devDependencies": {
+    "vsphere": "0.0.1"
+  }
 }
