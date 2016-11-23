@@ -4,7 +4,7 @@
   "description": "Used to control vSphere VMs and VApps",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "make test"
   },
   "repository": {
     "type": "git",
@@ -17,6 +17,8 @@
   },
   "homepage": "https://github.com/sintax1/vsphere-controller#readme",
   "devDependencies": {
+    "chai": "^3.5.0",
+    "mocha": "^3.1.2",
     "vsphere": "0.0.1"
   }
 }
