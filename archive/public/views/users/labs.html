@@ -1,0 +1,75 @@
+<div class="row alerts-container" data-ng-controller="AlertsCtrl" data-ng-show="alerts.length">
+  <div class="col-xs-12">
+    <uib-alert data-ng-repeat="alert in alerts" type="{{alert.type}}" close="closeAlert($index)">{{alert.msg}}</uib-alert>
+  </div>
+</div>
+
+<div class="row" ng-controller="vSphereSettingsCtrl">
+  <div class="col-xs-4">
+    <label for="serverSelect">Select vCenter: </label>
+    <select name="serverSelect" id="serverSelect" ng-options="server.name for server in servers track by server.name" ng-model="data.settings.selectedServer" ng-change="serverUpdate()">
+    </select>
+    <script type="text/ng-template" id="vSphereAuthModal.html">
+      <div class="modal-header">
+        <h3 class="modal-title">vSphere Auth</h3>
+      </div>
+      <form name="vSphereAuth">
+        <label for="user">Username:</label>
+        <input ng-model="auth.user" id="user" class="form-control" type="text" title="Username" />
+        <label for="pass">Password:</label>
+        <input ng-model="auth.pass" id="pass" class="form-control" type="password" title="Password" />
+      </form>
+      <div class="modal-footer">
+        <button class="btn btn-primary" ng-click="ok()">Save</button>
+        <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+      </div>
+    </script>
+
+    <button class="btn btn-default" ng-click="open()">Login</button>
+  </div>
+</div>
+
+</div>
+<div class="row" ng-controller="LabsCtrl">
+  <div class="col-xs-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-tasks" title="Labs">
+        <!--<a href="#">Manage</a>-->
+          </rd-widget-header>
+          <rd-widget-body classes="medium no-padding">
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <tr>
+                <th class="name">Name&nbsp;</th>
+                <th class="name">&nbsp;</th>
+                <th class="name">&nbsp;</th>
+                <th class="name">&nbsp;</th>
+                <th class="name">&nbsp;</th>
+                <th class="name">Status&nbsp;</th>
+                <th class="name">Instances&nbsp;</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr ng-repeat="lab in labs">
+                <td>{{lab.name}}</td>
+                <!--<td><switch disabled="processing" ng-change="start($index)" id="{{lab.id}}" name="active" ng-model="lab.active"></switch></td>-->
+                <td><a href="#" class="fa fa-play" ng-click="start($index)" title="Start" tooltip="Start"></a></td>
+                <td><a href="#" class="fa fa-stop" ng-click="stop($index)" title="Stop" tooltip="Stop"></a></td>
+                <td><a href="#" class="fa fa-clone" ng-click="clone($index)" title="Clone" tooltip="Clone"></a></td>
+                <td><a href="#" class="fa fa-trash" ng-click="delete($index)" title="Delete" tooltip="Delete"></a></td>
+                <td>{{lab.status | capitalize}}</td>
+                <td>{{lab.instances.length}}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+  <div class="col-xs-12 footer navbar-fixed-bottom" style="background-color:#eee;" id="vsphereMsg">
+    {{server_message}}
+  </div>
+</div>
+
