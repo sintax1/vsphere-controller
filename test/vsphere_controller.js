@@ -1,5 +1,5 @@
 var should = require('chai').should(),
-  vsphereCtrl = require('../index'),
+  vsphereCtrl = require('../lib/vsphere_controller'),
   authenticate = vsphereCtrl.authenticate;
 
 describe('#authenticate', function() {

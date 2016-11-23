@@ -2,7 +2,7 @@
   "name": "vsphere-controller",
   "version": "0.0.1",
   "description": "Used to control vSphere VMs and VApps",
-  "main": "index.js",
+  "main": "./lib/vsphere_controller.js",
   "scripts": {
     "test": "make test"
   },
