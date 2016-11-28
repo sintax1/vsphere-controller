@@ -1,6 +1,6 @@
 {
   "name": "vsphere-controller",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Used to control vSphere VMs and VApps",
   "main": "./lib/vsphere_controller.js",
   "scripts": {
@@ -19,6 +19,13 @@
   "devDependencies": {
     "chai": "^3.5.0",
     "mocha": "^3.1.2",
-    "vsphere": "0.0.1"
+    "sinon": "^1.17.6"
+  },
+  "dependencies": {
+    "events": "^1.1.1",
+    "joi": "^10.0.1",
+    "lodash": "^4.17.2",
+    "node-vsphere-soap": "0.0.2-5",
+    "util": "^0.10.3"
   }
 }
