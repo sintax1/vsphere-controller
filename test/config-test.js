@@ -3,8 +3,11 @@ var vCenterTestConfig = {
   'vCenterUser' : 'administrator@vsphere.local',
   'vCenterPassword' : 'P@ssword1',
   'vCenter' : true,
+  'templateFolderName': 'Templates',
   'advanced': {
-    'ResourcePoolName': 'Training'
+    'ResourcePoolName': 'Training',	// The Resource Pool used to store new VApps
+    'ResourcePoolCpuAllocation': -1,    // Cpu limit in Mhz (-1 = unlimited)
+    'ResourcePoolMemAllocation': -1,     // Mem limit in MB (-1 = unlimited)
   }        
 };
 exports.vCenterTestConfig = vCenterTestConfig;

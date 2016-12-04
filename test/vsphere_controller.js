@@ -95,28 +95,31 @@ describe('Client tests - query commands:', function (){
     }); 
   }); 
 
-  describe('#getVMNames()', function() {
-    it('can obtain all Virtual Machine names', function (done) {
-
-      VItest.getVMNames()
-        .once('result', function (result, raw){
-
-          expect(result.objects).to.exist;
-          //console.log(util.inspect(result.objects, {depth: null}));
-
-          if( _.isArray(result.objects) ) {
-            expect( _.sample(result.objects).obj.attributes.type).to.be.equal('VirtualMachine');
-          } else {
-            expect(result.objects.obj.attributes.type).to.be.equal('VirtualMachine');
-          }
+  describe('#getDatacenters()', function() {
+    it('can get a list of Datacenters', function( done ) {
+      VItest.getDatacenters()
+        .once('result', function(result) {
+          //console.log(util.inspect(result, {depth:null}));
           done();
         })
-        .once('error', function (err){
+        .once('error', function (err) {
           console.log('\n\nlast request : ' + VItest.vc.client.lastRequest);
         });
-
     });
-  }); 
+  });
+
+  describe('#getHosts()', function() {
+    it('can get a list of Hosts in the Datacenter', function( done ) {
+      VItest.getHosts()
+        .once('result', function(result) {
+          //console.log(util.inspect(result, {depth:null}));
+          done();
+        })
+        .once('error', function (err) {
+          console.log('\n\nlast request : ' + VItest.vc.client.lastRequest);
+        });
+    });
+  });
 
   describe('#getDatastores()', function() {
     it('can obtain all Datastores', function (done){
@@ -148,7 +151,7 @@ describe('Client tests - query commands:', function (){
           expect(result.objects).to.exist;
 
           if( _.isArray(result.objects) ) {
-            expect( _.sample(result.objects).obj.attributes.type).to.be.equal('ResourcePool');
+            expect( _.sample(result.objects).obj.attributes.type).to.be.oneOf(['ResourcePool', 'VirtualApp']);
           } else {
             expect(result.objects.obj.attributes.type).to.be.equal('ResourcePool');
           }
@@ -159,9 +162,9 @@ describe('Client tests - query commands:', function (){
         });
     });
   });
-            
+
   describe('#getResourcePoolByName()', function() {
-    it('can obtain Resource Pool by name: ' + '`' + TestConfig.advanced.ResourcePoolName + '`', function (done){
+    it('can obtain Resource Pool by name: `' + TestConfig.advanced.ResourcePoolName + '`', function (done){
 
       VItest.getResourcePoolByName( TestConfig.advanced.ResourcePoolName )
         .once('result', function (result){
@@ -175,6 +178,90 @@ describe('Client tests - query commands:', function (){
         });
     });
   });
+
+  /*
+  describe('#createResourcePool()', function() {
+    it('can create a Resource Pool with name `' + TestConfig.advanced.ResourcePoolName + '`', function( done ) {
+
+      var originalException = process.listeners('uncaughtException').pop()
+      //Needed in node 0.10.5+
+      process.removeListener('uncaughtException', originalException);
+
+      process.on("uncaughtException", function (err) {
+        expect(err).to.match(/The name 'Training' already exists/);
+        done()
+      })
+
+      VItest.createResourcePool( TestConfig.advanced.ResourcePoolName )
+        .once('result', function (result) {
+          expect(result.attributes).to.exist;
+          done();
+        })
+        .once('error', function (err) {
+          console.log('\n\nlast request : ' + VItest.vc.client.lastRequest);
+        });
+
+      process.nextTick(function () {
+        process.listeners('uncaughtException').push(originalException)
+      });
+
+    });
+  });
+  */
+
+  describe('#getVMNames()', function() {
+    it('can obtain all Virtual Machine names', function (done) {
+
+      VItest.getVMNames()
+        .once('result', function (result, raw){
+
+          expect(result.objects).to.exist;
+          //console.log(util.inspect(result.objects, {depth: null}));
+
+          if( _.isArray(result.objects) ) {
+            expect( _.sample(result.objects).obj.attributes.type).to.be.equal('VirtualMachine');
+          } else {
+            expect(result.objects.obj.attributes.type).to.be.equal('VirtualMachine');
+          }
+          done();
+        })
+        .once('error', function (err){
+          console.log('\n\nlast request : ' + VItest.vc.client.lastRequest);
+        });
+    });
+  }); 
+
+  describe('#getvAppsFromFolder()', function() {
+    it('can obtain all vApps from a Folder', function (done) {
+
+      VItest.getvAppsFromFolder( TestConfig.templateFolderName )
+        .once('result', function (result, raw){
+
+          //console.log(util.inspect(result.objects, {depth: null}));
+
+          expect(result.objects).to.exist;
+
+          if( _.isArray(result.objects) ) {
+            expect( _.sample(result.objects).obj.attributes.type).to.be.equal('VirtualApp');
+          } else {
+            expect(result.objects.obj.attributes.type).to.be.equal('VirtualApp');
+          }
+          done();
+        })
+        .once('error', function (err){
+          console.log('\n\nlast request : ' + VItest.vc.client.lastRequest);
+        });
+    });
+  });
+
+  describe('#getFolderByName()', function() {});
+
+  describe('#createFolder()', function() {});
+  describe('#getVirtualSwitchByName', function() {});
+  describe('#createVirtualSwitch()', function() {});
+  describe('#getVirtualPortGroupByName()', function() {});
+  describe('#getVirtualApplianceByName()', function() {});
+  describe('#cloneVirtualAppliance()', function() {});
           
 });
 
