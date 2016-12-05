@@ -237,14 +237,15 @@ describe('Client tests - query commands:', function (){
       VItest.getvAppsFromFolder( TestConfig.templateFolderName )
         .once('result', function (result, raw){
 
-          //console.log(util.inspect(result.objects, {depth: null}));
+          if( _.isEmpty(result) ) {
+            console.log('No vApp templates received. Is the Template folder empty on the vSphere server?');
+            done();
+          }
 
-          expect(result.objects).to.exist;
-
-          if( _.isArray(result.objects) ) {
-            expect( _.sample(result.objects).obj.attributes.type).to.be.equal('VirtualApp');
+          if( _.isArray(result) ) {
+            expect( _.sample(result).obj.attributes.type).to.be.equal('VirtualApp');
           } else {
-            expect(result.objects.obj.attributes.type).to.be.equal('VirtualApp');
+            expect(result.obj.attributes.type).to.be.equal('VirtualApp');
           }
           done();
         })
