@@ -21,24 +21,23 @@ describe('Client object initialization:', function () {
     
     VItest.once('ready', function () {
       expect(VItest.vc.userName).to.exist;
-      //console.log('logged in user : ' + VItest.vc.userName);
+      //done('logged in user : ' + VItest.vc.userName);
       expect(VItest.vc.fullName).to.exist;
-      //console.log('logged in user fullname : ' + VItest.vc.fullName);
+      //done('logged in user fullname : ' + VItest.vc.fullName);
       expect(VItest.serviceContent).to.exist;
-      //console.log(VItest.serviceContent);
+      //done(VItest.serviceContent);
       done();
 
     })
     .once('error', function (err) {
-      console.error(err);
+      done(err);
       // this should fail if there's a problem
       expect(VItest.vc.userName).to.exist;
-      //console.log('logged in user : ' + VItest.vc.userName);
+      //done('logged in user : ' + VItest.vc.userName);
       expect(VItest.vc.fullName).to.exist;
-      //console.log('logged in user fullname : ' + VItest.vc.fullName);
+      //done('logged in user fullname : ' + VItest.vc.fullName);
       expect(VItest.serviceContent).to.exist;
-      //console.log(VItest.serviceContent);
-      done();
+      //done(VItest.serviceContent);
     });
   });
 });
@@ -52,16 +51,16 @@ describe('Client reconnection test:', function () {
         // now we're logged out, so let's try running a command to test automatic re-login
         VItest.getCurrentTime()
           .once('result', function (result) {
-            //console.log(result);
+            //done(result);
             expect(result).to.be.an.instanceof(Date);
             done();
           })
           .once('error', function (err) {
-            console.error(err);
+            done(err);
           });
       })
       .once('error', function (err) {
-        console.error(err);
+        done(err);
       });
   });
 });
@@ -76,7 +75,7 @@ describe('Client tests - query commands:', function (){
           done();
       })
       .once('error', function (err) {
-        console.error(err);
+        done(err);
       });
     }); 
   }); 
@@ -90,7 +89,7 @@ describe('Client tests - query commands:', function (){
           done();
       })
       .once('error', function (err) {
-        console.error(err);
+        done(err);
       });
     }); 
   }); 
@@ -103,7 +102,7 @@ describe('Client tests - query commands:', function (){
           done();
         })
         .once('error', function (err) {
-          console.log('\n\nlast request : ' + VItest.vc.client.lastRequest);
+          done('\n\nlast request : ' + VItest.vc.client.lastRequest);
         });
     });
   });
@@ -116,7 +115,7 @@ describe('Client tests - query commands:', function (){
           done();
         })
         .once('error', function (err) {
-          console.log('\n\nlast request : ' + VItest.vc.client.lastRequest);
+          done('\n\nlast request : ' + VItest.vc.client.lastRequest);
         });
     });
   });
@@ -138,7 +137,7 @@ describe('Client tests - query commands:', function (){
           done();
         })
         .once('error', function (err){
-          console.log('\n\nlast request : ' + VItest.vc.client.lastRequest);
+          done('\n\nlast request : ' + VItest.vc.client.lastRequest);
         });
     });
   });
@@ -158,7 +157,7 @@ describe('Client tests - query commands:', function (){
           done();
         })
         .once('error', function (err){
-          console.log('\n\nlast request : ' + VItest.vc.client.lastRequest);
+          done('\n\nlast request : ' + VItest.vc.client.lastRequest);
         });
     });
   });
@@ -174,7 +173,7 @@ describe('Client tests - query commands:', function (){
           done();
         })
         .once('error', function (err){
-          console.log('\n\nlast request : ' + VItest.vc.client.lastRequest);
+          done('\n\nlast request : ' + VItest.vc.client.lastRequest);
         });
     });
   });
@@ -198,7 +197,7 @@ describe('Client tests - query commands:', function (){
           done();
         })
         .once('error', function (err) {
-          console.log('\n\nlast request : ' + VItest.vc.client.lastRequest);
+          done('\n\nlast request : ' + VItest.vc.client.lastRequest);
         });
 
       process.nextTick(function () {
@@ -216,7 +215,8 @@ describe('Client tests - query commands:', function (){
         .once('result', function (result, raw){
 
           expect(result.objects).to.exist;
-          //console.log(util.inspect(result.objects, {depth: null}));
+
+          //console.log( util.inspect(result, {depth:null}) );
 
           if( _.isArray(result.objects) ) {
             expect( _.sample(result.objects).obj.attributes.type).to.be.equal('VirtualMachine');
@@ -226,10 +226,35 @@ describe('Client tests - query commands:', function (){
           done();
         })
         .once('error', function (err){
-          console.log('\n\nlast request : ' + VItest.vc.client.lastRequest);
+          done('\n\nlast request : ' + VItest.vc.client.lastRequest);
         });
     });
   }); 
+
+  describe('#getFolderByName()', function() {
+    it('can get a folder MORef by name', function (done) {
+
+      VItest.getFolderByName( TestConfig.templateFolderName )
+        .once('result', function (result, raw){
+
+          //console.log( util.inspect(result, {depth:null}));
+
+          if( _.isEmpty(result) ) {
+            done('No folder found with name ' + TestConfig.templateFolderName);
+          }
+
+          if( _.isArray(result) ) {
+            expect( _.sample(result).attributes.type).to.be.equal('Folder');
+          } else {
+            expect(result.attributes.type).to.be.equal('Folder');
+          }
+          done();
+        })
+        .once('error', function (err){
+          done('\n\nlast request : ' + VItest.vc.client.lastRequest);
+        });
+    });
+  });
 
   describe('#getvAppsFromFolder()', function() {
     it('can obtain all vApps from a Folder', function (done) {
@@ -238,9 +263,10 @@ describe('Client tests - query commands:', function (){
         .once('result', function (result, raw){
 
           if( _.isEmpty(result) ) {
-            console.log('No vApp templates received. Is the Template folder empty on the vSphere server?');
-            done();
+            done('No vApp templates received. Is the Template folder empty on the vSphere server?');
           }
+
+          //console.log( util.inspect(result, {depth:null}) );
 
           if( _.isArray(result) ) {
             expect( _.sample(result).obj.attributes.type).to.be.equal('VirtualApp');
@@ -250,16 +276,101 @@ describe('Client tests - query commands:', function (){
           done();
         })
         .once('error', function (err){
-          console.log('\n\nlast request : ' + VItest.vc.client.lastRequest);
+          done('\n\nlast request : ' + VItest.vc.client.lastRequest);
         });
     });
   });
 
-  describe('#getFolderByName()', function() {});
+  describe('#createFolder()', function() {
+    it('can create a Folder', function (done) {
 
-  describe('#createFolder()', function() {});
-  describe('#getVirtualSwitchByName', function() {});
-  describe('#createVirtualSwitch()', function() {});
+      VItest.createFolder( TestConfig.templateFolderName )
+        .once('result', function (result, raw){
+
+          if( _.isEmpty(result) ) {
+            done('Failed to create folder named ' + TestConfig.templateFolderName);
+          }
+
+          console.log( util.inspect(result, {depth:null}) );
+
+          if( _.isArray(result) ) {
+            expect( _.sample(result).attributes.type).to.be.equal('Folder');
+          } else {
+            expect(result.attributes.type).to.be.equal('Folder');
+          }
+          done();
+        })
+        .once('error', function (err){
+          done('\n\nlast request : ' + VItest.vc.client.lastRequest);
+        });
+    });
+  });
+
+  describe('#getVirtualSwitchArray', function() {
+    it('can get all Virtual Switches', function (done) {
+
+      VItest.getVirtualSwitchArray()
+        .once('result', function (result, raw){
+
+          if( _.isEmpty(result) ) {
+            done('Failed to get all Virtual Switches');
+          }
+          
+          if( _.isArray(result) ) {
+            expect( _.sample(result).attributes['xsi:type']).to.be.equal('HostVirtualSwitch');
+          } else {
+            expect(result.attributes['xsi:type']).to.be.equal('HostVirtualSwitch');
+          }
+          done();
+        })
+        .once('error', function (err){
+          done('\n\nlast request : ' + VItest.vc.client.lastRequest);
+        });
+    });
+  });
+
+  describe('#getVirtualSwitchByName', function() {
+    it('can get a vSwitch by name', function (done) {
+
+      VItest.getVirtualSwitchByName( TestConfig.advanced.vSwitchName )
+        .once('result', function (result, raw){
+
+          if( _.isEmpty(result) ) {
+            done('Failed to get vSwitch with name ' + TestConfig.advanced.vSwitchName);
+          }
+
+          if( _.isArray(result) ) {
+            expect( _.sample(result).attributes['xsi:type']).to.be.equal('HostVirtualSwitch');
+          } else {
+            expect(result.attributes['xsi:type']).to.be.equal('HostVirtualSwitch');
+          }
+          done();
+        })
+        .once('error', function (err){
+          done('\n\nlast request : ' + VItest.vc.client.lastRequest);
+        });
+    });
+  });
+
+  describe('#createVirtualSwitch()', function() {
+    it('can create a VirtualSwitch', function (done) {
+
+      VItest.createVirtualSwitch( TestConfig.advanced.vSwitchName )
+        .once('result', function (result, raw){
+
+          if( _.isArray(result) ) {
+            expect( _.sample(result) ).to.be.empty;
+          } else {
+            expect(result).to.be.empty;
+          }
+          done();
+        })
+        .once('error', function (err){
+          done('\n\nlast request : ' + VItest.vc.client.lastRequest);
+        });
+    });
+  });
+
   describe('#getVirtualPortGroupByName()', function() {});
   describe('#getVirtualApplianceByName()', function() {});
   describe('#cloneVirtualAppliance()', function() {});
