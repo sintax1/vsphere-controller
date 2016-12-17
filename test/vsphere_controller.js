@@ -21,11 +21,11 @@ describe('Client object initialization:', function () {
     
     VItest.once('ready', function () {
       expect(VItest.vc.userName).to.exist;
-      //done('logged in user : ' + VItest.vc.userName);
+      //console.log('logged in user : ' + VItest.vc.userName);
       expect(VItest.vc.fullName).to.exist;
-      //done('logged in user fullname : ' + VItest.vc.fullName);
+      //console.log('logged in user fullname : ' + VItest.vc.fullName);
       expect(VItest.serviceContent).to.exist;
-      //done(VItest.serviceContent);
+      //console.log(VItest.serviceContent);
       done();
 
     })
@@ -33,11 +33,11 @@ describe('Client object initialization:', function () {
       done(err);
       // this should fail if there's a problem
       expect(VItest.vc.userName).to.exist;
-      //done('logged in user : ' + VItest.vc.userName);
+      //console.log('logged in user : ' + VItest.vc.userName);
       expect(VItest.vc.fullName).to.exist;
-      //done('logged in user fullname : ' + VItest.vc.fullName);
+      //console.log('logged in user fullname : ' + VItest.vc.fullName);
       expect(VItest.serviceContent).to.exist;
-      //done(VItest.serviceContent);
+      //console.log(VItest.serviceContent);
     });
   });
 });
@@ -51,7 +51,7 @@ describe('Client reconnection test:', function () {
         // now we're logged out, so let's try running a command to test automatic re-login
         VItest.getCurrentTime()
           .once('result', function (result) {
-            //done(result);
+            //console.log(result);
             expect(result).to.be.an.instanceof(Date);
             done();
           })
@@ -371,7 +371,54 @@ describe('Client tests - query commands:', function (){
     });
   });
 
-  describe('#getVirtualPortGroupByName()', function() {});
+  describe('#getPortGroupArray()', function() {
+    it('can get all Port Groups', function (done) {
+
+      VItest.getPortGroupArray()
+        .once('result', function (result, raw){
+
+          if( _.isEmpty(result) ) {
+            done('Failed to get all Port Groups');
+          }
+          
+          if( _.isArray(result) ) {
+            expect( _.sample(result).attributes['xsi:type']).to.be.equal('HostPortGroup');
+          } else {
+            expect(result.attributes['xsi:type']).to.be.equal('HostPortGroup');
+          }
+          done();
+        })
+        .once('error', function (err){
+          done('\n\nlast request : ' + VItest.vc.client.lastRequest);
+        });
+    });
+  });
+
+  describe('#getPortGroupByName()', function() {
+    it('can get a Port Group by name', function (done) {
+
+      VItest.getPortGroupByName( TestConfig.advanced.portGroupName )
+        .once('result', function (result, raw){
+
+          if( _.isEmpty(result) ) {
+            done('Failed to get Port Group with name ' + TestConfig.advanced.portGroupName);
+          }
+
+          if( _.isArray(result) ) {
+            expect( _.sample(result).attributes['xsi:type']).to.be.equal('HostPortGroup');
+          } else {
+            expect(result.attributes['xsi:type']).to.be.equal('HostPortGroup');
+          }
+          done();
+        })
+        .once('error', function (err){
+          done('\n\nlast request : ' + VItest.vc.client.lastRequest);
+        });
+    });
+  });
+
+  describe('#createPortGroup()', function() {});
+
   describe('#getVirtualApplianceByName()', function() {});
   describe('#cloneVirtualAppliance()', function() {});
           

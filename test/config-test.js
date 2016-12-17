@@ -9,6 +9,7 @@ var vCenterTestConfig = {
     'ResourcePoolCpuAllocation': -1,    // Cpu limit in Mhz (-1 = unlimited)
     'ResourcePoolMemAllocation': -1,     // Mem limit in MB (-1 = unlimited)
     'vSwitchName': 'Student1',
+    'portGroupName': 'Student1_1',
   }        
 };
 exports.vCenterTestConfig = vCenterTestConfig;
