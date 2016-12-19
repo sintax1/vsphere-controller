@@ -10,7 +10,10 @@ var chai = require('chai'),
   _ = require('lodash'),
   util = require('util'),
   EventEmitter = require('events').EventEmitter,
-  vsphereCtrl = require('../lib/client');
+  vsphereCtrl = require('../lib/client'),
+  CustomErrors = require('../lib/errors');
+
+var errors = new CustomErrors();
 
 var TestConfig = require('./config-test').vCenterTestConfig;
 
@@ -18,6 +21,8 @@ var VItest = new vsphereCtrl.Client(TestConfig.vCenterIP, TestConfig.vCenterUser
 
 describe('Client object initialization:', function () {
   it('provides a successful login', function (done) {
+
+    this.timeout(15000); // increased to wait for multiple login attempts
     
     VItest.once('ready', function () {
       expect(VItest.vc.userName).to.exist;
@@ -27,10 +32,14 @@ describe('Client object initialization:', function () {
       expect(VItest.serviceContent).to.exist;
       //console.log(VItest.serviceContent);
       done();
-
     })
     .once('error', function (err) {
-      done(err);
+      /*
+       * Error Messages:
+       *   Incorrect user or password: Cannot complete login due to an incorrect user name or password.
+       *   Can't connect to vsphere: Error: connect EHOSTUNREACH 172.16.201.133:443
+       */
+      done( new Error(err) );
       // this should fail if there's a problem
       expect(VItest.vc.userName).to.exist;
       //console.log('logged in user : ' + VItest.vc.userName);
@@ -56,11 +65,11 @@ describe('Client reconnection test:', function () {
             done();
           })
           .once('error', function (err) {
-            done(err);
+            done(new Error(err));
           });
       })
       .once('error', function (err) {
-        done(err);
+        done(new Error(err));
       });
   });
 });
@@ -75,7 +84,7 @@ describe('Client tests - query commands:', function (){
           done();
       })
       .once('error', function (err) {
-        done(err);
+        done(new Error(err));
       });
     }); 
   }); 
@@ -89,7 +98,7 @@ describe('Client tests - query commands:', function (){
           done();
       })
       .once('error', function (err) {
-        done(err);
+        done(new Error(err));
       });
     }); 
   }); 
@@ -102,7 +111,7 @@ describe('Client tests - query commands:', function (){
           done();
         })
         .once('error', function (err) {
-          done('\n\nlast request : ' + VItest.vc.client.lastRequest);
+          done(new Error(err));
         });
     });
   });
@@ -115,7 +124,7 @@ describe('Client tests - query commands:', function (){
           done();
         })
         .once('error', function (err) {
-          done('\n\nlast request : ' + VItest.vc.client.lastRequest);
+          done(new Error(err));
         });
     });
   });
@@ -137,7 +146,7 @@ describe('Client tests - query commands:', function (){
           done();
         })
         .once('error', function (err){
-          done('\n\nlast request : ' + VItest.vc.client.lastRequest);
+          done(new Error(err));
         });
     });
   });
@@ -157,7 +166,7 @@ describe('Client tests - query commands:', function (){
           done();
         })
         .once('error', function (err){
-          done('\n\nlast request : ' + VItest.vc.client.lastRequest);
+          done(new Error(err));
         });
     });
   });
@@ -173,23 +182,13 @@ describe('Client tests - query commands:', function (){
           done();
         })
         .once('error', function (err){
-          done('\n\nlast request : ' + VItest.vc.client.lastRequest);
+          done(new Error(err));
         });
     });
   });
 
-  /*
   describe('#createResourcePool()', function() {
     it('can create a Resource Pool with name `' + TestConfig.advanced.ResourcePoolName + '`', function( done ) {
-
-      var originalException = process.listeners('uncaughtException').pop()
-      //Needed in node 0.10.5+
-      process.removeListener('uncaughtException', originalException);
-
-      process.on("uncaughtException", function (err) {
-        expect(err).to.match(/The name 'Training' already exists/);
-        done()
-      })
 
       VItest.createResourcePool( TestConfig.advanced.ResourcePoolName )
         .once('result', function (result) {
@@ -197,16 +196,11 @@ describe('Client tests - query commands:', function (){
           done();
         })
         .once('error', function (err) {
-          done('\n\nlast request : ' + VItest.vc.client.lastRequest);
+          expect(err).to.match(/The name .* already exists./);
+          done();
         });
-
-      process.nextTick(function () {
-        process.listeners('uncaughtException').push(originalException)
-      });
-
     });
   });
-  */
 
   describe('#getVMNames()', function() {
     it('can obtain all Virtual Machine names', function (done) {
@@ -226,7 +220,7 @@ describe('Client tests - query commands:', function (){
           done();
         })
         .once('error', function (err){
-          done('\n\nlast request : ' + VItest.vc.client.lastRequest);
+          done(new Error(err));
         });
     });
   }); 
@@ -237,12 +231,6 @@ describe('Client tests - query commands:', function (){
       VItest.getFolderByName( TestConfig.templateFolderName )
         .once('result', function (result, raw){
 
-          //console.log( util.inspect(result, {depth:null}));
-
-          if( _.isEmpty(result) ) {
-            done('No folder found with name ' + TestConfig.templateFolderName);
-          }
-
           if( _.isArray(result) ) {
             expect( _.sample(result).attributes.type).to.be.equal('Folder');
           } else {
@@ -251,7 +239,8 @@ describe('Client tests - query commands:', function (){
           done();
         })
         .once('error', function (err){
-          done('\n\nlast request : ' + VItest.vc.client.lastRequest);
+          expect(err).to.match(/The folder with name .* could not be found./);
+          done();
         });
     });
   });
@@ -262,12 +251,6 @@ describe('Client tests - query commands:', function (){
       VItest.getvAppsFromFolder( TestConfig.templateFolderName )
         .once('result', function (result, raw){
 
-          if( _.isEmpty(result) ) {
-            done('No vApp templates received. Is the Template folder empty on the vSphere server?');
-          }
-
-          //console.log( util.inspect(result, {depth:null}) );
-
           if( _.isArray(result) ) {
             expect( _.sample(result).obj.attributes.type).to.be.equal('VirtualApp');
           } else {
@@ -276,7 +259,8 @@ describe('Client tests - query commands:', function (){
           done();
         })
         .once('error', function (err){
-          done('\n\nlast request : ' + VItest.vc.client.lastRequest);
+          expect(err).to.match(/No vApps found in template folder with name|The folder with name .* could not be found./);
+          done();
         });
     });
   });
@@ -291,8 +275,6 @@ describe('Client tests - query commands:', function (){
             done('Failed to create folder named ' + TestConfig.templateFolderName);
           }
 
-          console.log( util.inspect(result, {depth:null}) );
-
           if( _.isArray(result) ) {
             expect( _.sample(result).attributes.type).to.be.equal('Folder');
           } else {
@@ -300,8 +282,9 @@ describe('Client tests - query commands:', function (){
           }
           done();
         })
-        .once('error', function (err){
-          done('\n\nlast request : ' + VItest.vc.client.lastRequest);
+        .once('error', function (err) {
+          expect(err).to.match(/The name .* already exists./);
+          done();
         });
     });
   });
@@ -324,7 +307,7 @@ describe('Client tests - query commands:', function (){
           done();
         })
         .once('error', function (err){
-          done('\n\nlast request : ' + VItest.vc.client.lastRequest);
+          done(new Error(err));
         });
     });
   });
@@ -347,7 +330,7 @@ describe('Client tests - query commands:', function (){
           done();
         })
         .once('error', function (err){
-          done('\n\nlast request : ' + VItest.vc.client.lastRequest);
+          done(new Error(err));
         });
     });
   });
@@ -366,7 +349,8 @@ describe('Client tests - query commands:', function (){
           done();
         })
         .once('error', function (err){
-          done('\n\nlast request : ' + VItest.vc.client.lastRequest);
+          expect(err).to.match(/The specified key, name, or identifier .* already exists./);
+          done();
         });
     });
   });
@@ -389,7 +373,7 @@ describe('Client tests - query commands:', function (){
           done();
         })
         .once('error', function (err){
-          done('\n\nlast request : ' + VItest.vc.client.lastRequest);
+          done(new Error(err));
         });
     });
   });
@@ -412,7 +396,7 @@ describe('Client tests - query commands:', function (){
           done();
         })
         .once('error', function (err){
-          done('\n\nlast request : ' + VItest.vc.client.lastRequest);
+          done(new Error(err));
         });
     });
   });
