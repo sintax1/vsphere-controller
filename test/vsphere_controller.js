@@ -404,25 +404,49 @@ describe('Client tests - query commands:', function (){
     });
   });
 
-  describe('#cloneVirtualAppliance()', function() {
+  describe('#cloneVirtualApp()', function() {
     it('can clone a vApp', function (done) {
 
     this.timeout(15000); // increased to wait for clone to finish
 
-      VItest.cloneVirtualAppliance( TestConfig.advanced.srcVirtualAppName, TestConfig.advanced.dstVirtualAppName, 
-        TestConfig.advanced.dstDatastoreName, TestConfig.advanced.dstResourcePoolName, TestConfig.advanced.dstFolderName )
-        .once('result', function (result, raw){
-          console.log(util.inspect(result, {depth:null}));
-          done();
-        })
-        .on('message', function (msg){
-          console.log(util.inspect(msg, {depth:null}));
-        })
-        .once('error', function (err){
-          expect(err).to.match(/The name .* already exists/);
-          done();
-          //done(new Error(err));
-        });
+    VItest.cloneVirtualApp( TestConfig.advanced.srcVirtualAppName, TestConfig.advanced.dstVirtualAppName, 
+      TestConfig.advanced.dstDatastoreName, TestConfig.advanced.dstResourcePoolName, TestConfig.advanced.dstFolderName )
+      .once('result', function (result){
+        expect(result['info.state'].$value).to.be.equal('success');
+        done();
+      })
+      .on('message', function (msg){
+        console.log('message:', util.inspect(msg, {depth:null}));
+      })
+      .on('progress', function (msg){
+        console.log('progress:', util.inspect(msg, {depth:null}));
+      })
+      .once('error', function (err){
+        expect(err).to.match(/The name .* already exists/);
+        done();
+      });
+    });
+  });
+
+  describe('#deleteVirtualApp()', function() {
+    it('can delete a vApp', function (done) {
+
+    this.timeout(15000); // increased to wait for clone to finish
+
+    VItest.deleteVirtualApp( TestConfig.advanced.dstVirtualAppName )
+      .once('result', function (result){
+        expect(result['info.state'].$value).to.be.equal('success');
+        done();
+      })
+      .on('message', function (msg){
+        console.log('message:', util.inspect(msg, {depth:null}));
+      })
+      .on('progress', function (msg){
+        console.log('progress:', util.inspect(msg, {depth:null}));
+      })
+      .once('error', function (err){
+        done(new Error(err));
+      });
     });
   });
 
