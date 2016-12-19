@@ -26,11 +26,8 @@ describe('Client object initialization:', function () {
     
     VItest.once('ready', function () {
       expect(VItest.vc.userName).to.exist;
-      //console.log('logged in user : ' + VItest.vc.userName);
       expect(VItest.vc.fullName).to.exist;
-      //console.log('logged in user fullname : ' + VItest.vc.fullName);
       expect(VItest.serviceContent).to.exist;
-      //console.log(VItest.serviceContent);
       done();
     })
     .once('error', function (err) {
@@ -39,14 +36,10 @@ describe('Client object initialization:', function () {
        *   Incorrect user or password: Cannot complete login due to an incorrect user name or password.
        *   Can't connect to vsphere: Error: connect EHOSTUNREACH 172.16.201.133:443
        */
-      done( new Error(err) );
-      // this should fail if there's a problem
+      //done( new Error(err) );
       expect(VItest.vc.userName).to.exist;
-      //console.log('logged in user : ' + VItest.vc.userName);
       expect(VItest.vc.fullName).to.exist;
-      //console.log('logged in user fullname : ' + VItest.vc.fullName);
       expect(VItest.serviceContent).to.exist;
-      //console.log(VItest.serviceContent);
     });
   });
 });
