@@ -10,6 +10,7 @@ var vCenterTestConfig = {
     'ResourcePoolMemAllocation': -1,     // Mem limit in MB (-1 = unlimited)
     'vSwitchName': 'Student1',
     'portGroupName': 'Student1_1',
+    'portGroupVlan': 301,
   }        
 };
 exports.vCenterTestConfig = vCenterTestConfig;

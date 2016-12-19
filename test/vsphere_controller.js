@@ -53,7 +53,6 @@ describe('Client reconnection test:', function () {
         // now we're logged out, so let's try running a command to test automatic re-login
         VItest.getCurrentTime()
           .once('result', function (result) {
-            //console.log(result);
             expect(result).to.be.an.instanceof(Date);
             done();
           })
@@ -100,7 +99,6 @@ describe('Client tests - query commands:', function (){
     it('can get a list of Datacenters', function( done ) {
       VItest.getDatacenters()
         .once('result', function(result) {
-          //console.log(util.inspect(result, {depth:null}));
           done();
         })
         .once('error', function (err) {
@@ -113,7 +111,6 @@ describe('Client tests - query commands:', function (){
     it('can get a list of Hosts in the Datacenter', function( done ) {
       VItest.getHosts()
         .once('result', function(result) {
-          //console.log(util.inspect(result, {depth:null}));
           done();
         })
         .once('error', function (err) {
@@ -129,7 +126,6 @@ describe('Client tests - query commands:', function (){
         .once('result', function (result){
 
           expect(result.objects).to.exist;
-          //console.log(util.inspect(result.objects, {depth: null}));
 
           if( _.isArray(result.objects) ) {
             expect( _.sample(result.objects).obj.attributes.type).to.be.equal('Datastore');
@@ -202,8 +198,6 @@ describe('Client tests - query commands:', function (){
         .once('result', function (result, raw){
 
           expect(result.objects).to.exist;
-
-          //console.log( util.inspect(result, {depth:null}) );
 
           if( _.isArray(result.objects) ) {
             expect( _.sample(result.objects).obj.attributes.type).to.be.equal('VirtualMachine');
@@ -378,7 +372,7 @@ describe('Client tests - query commands:', function (){
         .once('result', function (result, raw){
 
           if( _.isEmpty(result) ) {
-            done('Failed to get Port Group with name ' + TestConfig.advanced.portGroupName);
+            done();
           }
 
           if( _.isArray(result) ) {
@@ -394,7 +388,21 @@ describe('Client tests - query commands:', function (){
     });
   });
 
-  describe('#createPortGroup()', function() {});
+  describe('#createPortGroup()', function() {
+    it('can create a port group', function (done) {
+
+      VItest.createPortGroup( TestConfig.advanced.vSwitchName, TestConfig.advanced.portGroupName, TestConfig.advanced.portGroupVlan )
+        .once('result', function (result, raw){
+
+          expect(result).to.be.empty;
+          done();
+        })
+        .once('error', function (err){
+          expect(err).to.match(/The specified key, name, or identifier .* already exists./);
+          done();
+        });
+    });
+  });
 
   describe('#getVirtualApplianceByName()', function() {});
   describe('#cloneVirtualAppliance()', function() {});
