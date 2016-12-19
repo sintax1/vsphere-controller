@@ -191,10 +191,10 @@ describe('Client tests - query commands:', function (){
     });
   });
 
-  describe('#getVMNames()', function() {
-    it('can obtain all Virtual Machine names', function (done) {
+  describe('#getVMArray()', function() {
+    it('can obtain all Virtual Machines', function (done) {
 
-      VItest.getVMNames()
+      VItest.getVMArray()
         .once('result', function (result, raw){
 
           expect(result.objects).to.exist;
@@ -232,10 +232,10 @@ describe('Client tests - query commands:', function (){
     });
   });
 
-  describe('#getvAppsFromFolder()', function() {
+  describe('#getVirtualAppsFromFolder()', function() {
     it('can obtain all vApps from a Folder', function (done) {
 
-      VItest.getvAppsFromFolder( TestConfig.templateFolderName )
+      VItest.getVirtualAppsFromFolder( TestConfig.templateFolderName )
         .once('result', function (result, raw){
 
           if( _.isArray(result) ) {
