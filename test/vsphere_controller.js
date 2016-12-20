@@ -252,6 +252,25 @@ describe('Client tests - query commands:', function (){
     });
   });
 
+  describe('#getVirtualAppByName()', function() {
+    it('can get a Virtual App by name', function (done) {
+
+      VItest.getVirtualAppByName( TestConfig.advanced.srcVirtualAppName )
+        .once('result', function (result){
+
+          if( _.isArray(result) ) {
+            expect( _.sample(result).obj.attributes.type).to.be.equal('VirtualApp');
+          } else {
+            expect(result.obj.attributes.type).to.be.equal('VirtualApp');
+          }
+          done();
+        })
+        .once('error', function (err){
+          done(new Error(err));
+        });
+    });
+  });
+
   describe('#createFolder()', function() {
     it('can create a Folder', function (done) {
 
@@ -415,12 +434,6 @@ describe('Client tests - query commands:', function (){
           expect(result['info.state'].$value).to.be.equal('success');
           done();
         })
-        .on('message', function (msg){
-          console.log('message:', util.inspect(msg, {depth:null}));
-        })
-        .on('progress', function (msg){
-          console.log('progress:', util.inspect(msg, {depth:null}));
-        })
         .once('error', function (err){
           expect(err).to.match(/The name .* already exists/);
           done();
@@ -438,11 +451,58 @@ describe('Client tests - query commands:', function (){
         .once('result', function (result){
           done();
         })
-        .on('message', function (msg){
-          console.log('message:', util.inspect(msg, {depth:null}));
+        .once('error', function (err){
+          done(new Error(err));
+        });
+    });
+  });
+
+  describe('#getVirtualAppStatus', function() {
+    it('can get vApp status', function (done) {
+
+      VItest.getVirtualAppByName( TestConfig.advanced.dstVirtualAppName )
+        .once('result', function (result){
+
+          expect(result.obj.attributes.type).to.be.equal('VirtualApp');
+
+          var vAppMORef = result.obj;
+
+          VItest.getVirtualAppStatus( vAppMORef )
+            .once('result', function (result){
+              expect(result).to.be.equal('stopped');
+              done();
+            })
+            .once('error', function (err){
+              done(new Error(err));
+            });
         })
-        .on('progress', function (msg){
-          console.log('progress:', util.inspect(msg, {depth:null}));
+        .once('error', function (err){
+          done(new Error(err));
+        });
+
+    });
+  });
+
+  describe('#powerOpVApp', function() {
+    it('can power on a vApp', function (done) {
+
+    this.timeout(15000); // increased to wait for multiple login attempts
+
+      VItest.getVirtualAppByName( TestConfig.advanced.dstVirtualAppName )
+        .once('result', function (result){
+
+          expect(result.obj.attributes.type).to.be.equal('VirtualApp');
+
+          var vAppMORef = result.obj;
+
+          VItest.powerOpVApp( vAppMORef, 'powerOn' )
+            .once('result', function (result){
+              expect(result['$value']).to.be.equal('success');
+              done();
+            })
+            .once('error', function (err){
+              done(new Error(err));
+            });
         })
         .once('error', function (err){
           done(new Error(err));
@@ -450,6 +510,36 @@ describe('Client tests - query commands:', function (){
     });
   });
 
+  describe('#powerOpVApp', function() {
+    it('can power off a vApp', function (done) {
+
+      this.timeout(30000); // increased to wait for clone to finish
+ 
+      setTimeout(function() { // Wait for vApp network adapter updates to complete
+
+        VItest.getVirtualAppByName( TestConfig.advanced.dstVirtualAppName )
+          .once('result', function (result){
+
+            expect(result.obj.attributes.type).to.be.equal('VirtualApp');
+  
+            var vAppMORef = result.obj;
+  
+            VItest.powerOpVApp( vAppMORef, 'powerOff' )
+              .once('result', function (result){
+                expect(result['$value']).to.be.equal('success');
+                done();
+              })
+              .once('error', function (err){
+                done(new Error(err));
+              });
+          })
+          .once('error', function (err){
+            done(new Error(err));
+          });
+
+      }); // setTimeout
+    });
+  });
 
   describe('#deleteVirtualApp()', function() {
     it('can delete a vApp', function (done) {
@@ -463,16 +553,10 @@ describe('Client tests - query commands:', function (){
             expect(result['info.state'].$value).to.be.equal('success');
             done();
           })
-          .on('message', function (msg){
-            console.log('message:', util.inspect(msg, {depth:null}));
-          })
-          .on('progress', function (msg){
-            console.log('progress:', util.inspect(msg, {depth:null}));
-          })
           .once('error', function (err){
             done(new Error(err));
           });
-      });
+      }); // setTimeout
     });
   });
 
