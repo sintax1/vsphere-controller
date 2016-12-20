@@ -407,45 +407,71 @@ describe('Client tests - query commands:', function (){
   describe('#cloneVirtualApp()', function() {
     it('can clone a vApp', function (done) {
 
-    this.timeout(15000); // increased to wait for clone to finish
+      this.timeout(15000); // increased to wait for clone to finish
 
-    VItest.cloneVirtualApp( TestConfig.advanced.srcVirtualAppName, TestConfig.advanced.dstVirtualAppName, 
-      TestConfig.advanced.dstDatastoreName, TestConfig.advanced.dstResourcePoolName, TestConfig.advanced.dstFolderName )
-      .once('result', function (result){
-        expect(result['info.state'].$value).to.be.equal('success');
-        done();
-      })
-      .on('message', function (msg){
-        console.log('message:', util.inspect(msg, {depth:null}));
-      })
-      .on('progress', function (msg){
-        console.log('progress:', util.inspect(msg, {depth:null}));
-      })
-      .once('error', function (err){
-        expect(err).to.match(/The name .* already exists/);
-        done();
-      });
+      VItest.cloneVirtualApp( TestConfig.advanced.srcVirtualAppName, TestConfig.advanced.dstVirtualAppName, 
+        TestConfig.advanced.dstDatastoreName, TestConfig.advanced.dstResourcePoolName, TestConfig.advanced.dstFolderName )
+        .once('result', function (result){
+          expect(result['info.state'].$value).to.be.equal('success');
+          done();
+        })
+        .on('message', function (msg){
+          console.log('message:', util.inspect(msg, {depth:null}));
+        })
+        .on('progress', function (msg){
+          console.log('progress:', util.inspect(msg, {depth:null}));
+        })
+        .once('error', function (err){
+          expect(err).to.match(/The name .* already exists/);
+          done();
+        });
     });
   });
+
+  describe('#updateVirtualAppNetworkAdapters()', function() {
+    it('can update network adapters within vApp', function (done) {
+
+      this.timeout(15000); // increased to wait for clone to finish
+
+      VItest.updateVirtualAppNetworkAdapters( TestConfig.advanced.dstVirtualAppName, 
+        TestConfig.advanced.searchNetworkName, TestConfig.advanced.replaceNetworkName )
+        .once('result', function (result){
+          done();
+        })
+        .on('message', function (msg){
+          console.log('message:', util.inspect(msg, {depth:null}));
+        })
+        .on('progress', function (msg){
+          console.log('progress:', util.inspect(msg, {depth:null}));
+        })
+        .once('error', function (err){
+          done(new Error(err));
+        });
+    });
+  });
+
 
   describe('#deleteVirtualApp()', function() {
     it('can delete a vApp', function (done) {
 
-    this.timeout(15000); // increased to wait for clone to finish
+      this.timeout(30000); // increased to wait for clone to finish
+ 
+      setTimeout(function() { // Wait for vApp network adapter updates to complete
 
-    VItest.deleteVirtualApp( TestConfig.advanced.dstVirtualAppName )
-      .once('result', function (result){
-        expect(result['info.state'].$value).to.be.equal('success');
-        done();
-      })
-      .on('message', function (msg){
-        console.log('message:', util.inspect(msg, {depth:null}));
-      })
-      .on('progress', function (msg){
-        console.log('progress:', util.inspect(msg, {depth:null}));
-      })
-      .once('error', function (err){
-        done(new Error(err));
+        VItest.deleteVirtualApp( TestConfig.advanced.dstVirtualAppName )
+          .once('result', function (result){
+            expect(result['info.state'].$value).to.be.equal('success');
+            done();
+          })
+          .on('message', function (msg){
+            console.log('message:', util.inspect(msg, {depth:null}));
+          })
+          .on('progress', function (msg){
+            console.log('progress:', util.inspect(msg, {depth:null}));
+          })
+          .once('error', function (err){
+            done(new Error(err));
+          });
       });
     });
   });

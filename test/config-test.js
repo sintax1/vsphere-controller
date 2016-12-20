@@ -15,7 +15,9 @@ var vCenterTestConfig = {
     'dstVirtualAppName': 		'Test-Clone-1', 
     'dstDatastoreName': 		'datastore1', 
     'dstResourcePoolName': 		'Training', 
-    'dstFolderName':			'Student1'
+    'dstFolderName':			'Student1',
+    'searchNetworkName':		'Student1',
+    'replaceNetworkName':               'Student2'
   }        
 };
 exports.vCenterTestConfig = vCenterTestConfig;
