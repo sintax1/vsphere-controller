@@ -560,5 +560,19 @@ describe('Client tests - query commands:', function (){
     });
   });
 
+  describe('#getUserRoles()', function() {
+    it('can get the roles that a user belongs to', function (done) {
+
+      VItest.getUserRoles()
+        .once('result', function (result){
+          expect(result).to.deep.include.members([{ user: 'Administrators', domain: 'VSPHERE.LOCAL' }]);
+          done();
+        })
+        .once('error', function (err){
+          done(new Error(err));
+        });
+    });
+  });
+
 });
 
