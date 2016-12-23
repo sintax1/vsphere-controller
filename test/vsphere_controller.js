@@ -574,5 +574,19 @@ describe('Client tests - query commands:', function (){
     });
   });
 
+  describe('#sessionIsActive()', function() {
+    it('can check if login session is active', function (done) {
+
+      VItest.sessionIsActive()
+        .once('result', function (result){
+          expect(result).to.be.true;
+          done();
+        })
+        .once('error', function (err){
+          done(new Error(err));
+        });
+    });
+  });
+
 });
 
